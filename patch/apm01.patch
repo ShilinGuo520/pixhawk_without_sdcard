@@ -1,0 +1,40 @@
+commit 0aa72ca5c4fbe223a3d15aeef95eb461cd3589d1
+Author: shilin.guo <shilin.guo@ck-telecom.com>
+Date:   Wed May 4 15:24:12 2016 +0800
+
+     Changes to be committed:
+    	modified:   mk/PX4/ROMFS/init.d/rcS
+
+diff --git a/mk/PX4/ROMFS/init.d/rcS b/mk/PX4/ROMFS/init.d/rcS
+index f74c56a..d56e353 100755
+--- a/mk/PX4/ROMFS/init.d/rcS
++++ b/mk/PX4/ROMFS/init.d/rcS
+@@ -47,12 +47,8 @@ then
+ else
+ 	echo "[init] no microSD card found"
+         set HAVE_MICROSD 0
+-	# Play SOS
+-	tone_alarm 2
+-        if [ $HAVE_RGBLED == 1 ]
+-        then
+-                rgbled rgb 16 0 0
+-        fi
++	# Start playing the startup tune
++	tone_alarm start
+ fi
+ 
+ #
+@@ -96,5 +92,12 @@ then
+ 	# if APM startup is successful then nsh will exit
+ 	sh /etc/init.d/rc.APM
+ else
+-        nshterm /dev/ttyACM0 &
++	if [ -f /etc/init.d/rc.APMNS ]
++	then
++		echo "[init] Running rc.APM without SD"
++		# if APM startup is successful then nsh will exit
++		sh /etc/init.d/rc.APMNS
++	else
++		nshterm /dev/ttyACM0 &
++	fi
+ fi
